@@ -21,7 +21,7 @@ function fakeCtx() {
 }
 
 const sample = [
-  { key: 'gh:a/agent', title: 'a/agent：open-source AI agent for video editing', link: 'https://github.com/a/agent', platform: 'GitHub', zone: 'tools', metrics: { stars: 900 }, published: new Date(Date.now() - 20 * 36e5).toISOString() },
+  { key: 'gh:a/agent', title: 'a/agent：open-source AI agent for video editing', link: 'https://github.com/a/agent', platform: 'GitHub', zone: 'tools', metrics: { stars: 900, fork: 60 }, published: new Date(Date.now() - 20 * 36e5).toISOString() },
   { key: 'gh:b/x-win', title: 'b/x-win：Photo editor on Windows 11', link: 'https://github.com/b/x-win', platform: 'GitHub', zone: 'tools', metrics: { stars: 5000 }, published: new Date().toISOString() },
   { key: 'hn:1', title: 'OpenAI releases a new reasoning model', link: 'https://x', platform: 'Hacker News', zone: 'global', metrics: { score: 500, comment: 300 }, published: new Date(Date.now() - 5 * 36e5).toISOString() },
   { key: 'hn:2', title: 'Gardening tips for winter', link: 'https://y', platform: 'Hacker News', zone: 'global', metrics: { score: 800 }, published: new Date().toISOString() },
@@ -65,4 +65,13 @@ test('apply：注册工具/路由/技能，离线读写日报', async () => {
   assert.equal(cfg.mode, 'anonymous')
   const css = await fetch(base + '/style.css'); assert.equal(css.status, 200)
   srv.close()
+})
+
+test('rank：刷星仓库（星多 fork 少）和 uncensored 变体被过滤', () => {
+  const z = rank([
+    { key: 'gh:x/fake', title: 'x/fake：AI video editing system', platform: 'GitHub', zone: 'tools', metrics: { stars: 400, fork: 0 }, published: new Date().toISOString() },
+    { key: 'hf:a/M-Uncensored', title: 'a/M-Uncensored', platform: 'Hugging Face', zone: 'tools', metrics: { like: 300 }, published: new Date().toISOString() },
+    { key: 'gh:y/real', title: 'y/real：AI agent toolkit', platform: 'GitHub', zone: 'tools', metrics: { stars: 400, fork: 30 }, published: new Date().toISOString() },
+  ])
+  assert.deepEqual(z.tools.items.map(i => i.key), ['gh:y/real'])
 })

@@ -26,7 +26,13 @@ export const SPAM_NAME = /-(win|windows|pc|mac|crack|free|pro)$|-(win|pc)-/i
 export const SPAM = /on Windows 1[01]|crack|keygen|activat(or|ion)|license key|cheat|aimbot|uncensored|auto-?complet|free download|unlocker|executor|spoofer|injector/i
 
 export function relevance(it, kw) {
-  if (it.platform === 'GitHub' && (SPAM_NAME.test(it.key) || SPAM.test(it.title))) return 0
+  if (it.platform === 'Hugging Face' && /uncensored|abliterat|nsfw/i.test(it.title)) return 0
+  if (it.platform === 'GitHub') {
+    if (SPAM_NAME.test(it.key) || SPAM.test(it.title)) return 0
+    // 刷星特征：星很多但几乎没人 fork（真实项目 fork/星 通常 ≥ 2%）
+    const st = +it.metrics?.stars || 0, fk = +it.metrics?.fork || 0
+    if (st >= 150 && fk / st < 0.02) return 0
+  }
   const t = `${it.title} ${(it.tags || []).join(' ')} ${it.summary || ''}`
   if (kw.strongRx.test(t)) return 1
   if (kw.midRx.test(t)) return 0.6
