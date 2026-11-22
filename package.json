@@ -1,0 +1,51 @@
+{
+  "name": "dsh-radar",
+  "version": "0.1.0",
+  "description": "每日雷达 + 创意选题：DeepSeek Harness (DSH) 插件。免登录抓取 Hacker News / Hugging Face / GitHub / B站 / YouTube 的 AI 热点，按热度·增速·新鲜度出榜，并用「选题组装公式」生成创意话题。",
+  "type": "module",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-workspace"
+      ]
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "files": [
+    "lib",
+    "skills",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "pack": "node scripts/build.mjs && npm pack ./dist --pack-destination .",
+    "test": "node --test tests/*.test.js",
+    "radar": "node src/engine.js run",
+    "topics": "node src/engine.js topics"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "radar",
+    "ai-news",
+    "topics"
+  ]
+}

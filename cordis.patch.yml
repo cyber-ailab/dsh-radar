@@ -1,0 +1,4 @@
+# dsh-radar 组合包：装上就启用（免登录即可用；数据存 ~/.dsh-radar）
+- insert:
+    - id: dsh-radar
+      name: dsh-radar
