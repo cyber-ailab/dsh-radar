@@ -8,7 +8,7 @@
 
 ![每日雷达面板](docs/screenshot-radar.png)
 
-> 📺 [配套教程视频（B站，3 分钟看懂安装和用法）](https://www.bilibili.com/video/BV1wjyDz6EV6)
+> 📺 [配套教程视频（B站，3 分钟看懂安装和用法）](https://www.bilibili.com/video/BV1wjyDz6EV6) · 📝 [图文教程（公众号）](https://mp.weixin.qq.com/s/CS6VA3q8zYFkcbXQwk-mNg)
 >
 > 觉得有用，点右上角 ⭐ Star 就是最大的支持；想要哪个平台的榜单、哪种选题栏目，去 [Issues](https://github.com/cyber-ailab/dsh-radar/issues) 或 [Discussions](https://github.com/cyber-ailab/dsh-radar/discussions) 告诉我们。
 
@@ -120,6 +120,7 @@ npm run pack   # 产出 dsh-radar-<version>.tgz
 - 抖音：**赛博实验室**（抖音号 `cyberlaboratory`）· [主页](https://www.douyin.com/user/MS4wLjABAAAA00XEpPcyhO1sKmolKQEWvU1TeyDcVwTG9lmeLguMQvc)
 - B站：**赛博Laboratory** · [主页](https://space.bilibili.com/485924578)
 - 📺 **教程视频**（从零安装、使用、打分拆解）：[B站 · 别再一个个平台刷热点了](https://www.bilibili.com/video/BV1wjyDz6EV6)
+- 📝 **图文教程**（安装步骤、打分公式、边界和坑）：[公众号 · 还在一个个平台刷热点？](https://mp.weixin.qq.com/s/CS6VA3q8zYFkcbXQwk-mNg)
 
 ## 许可证
 

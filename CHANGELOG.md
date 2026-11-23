@@ -2,7 +2,7 @@
 
 ## 0.1.0 - 2026-11-23
 
-首个公开版本。配套教程视频：[B站 BV1wjyDz6EV6](https://www.bilibili.com/video/BV1wjyDz6EV6)。
+首个公开版本。配套教程视频：[B站 BV1wjyDz6EV6](https://www.bilibili.com/video/BV1wjyDz6EV6)，图文教程：[公众号](https://mp.weixin.qq.com/s/CS6VA3q8zYFkcbXQwk-mNg)。
 
 - 九个免登录数据源：抖音热榜、微博热搜、今日头条热榜、百度热搜、B站排行、Hacker News、Hugging Face 趋势、GitHub 新星、YouTube 频道。
 - 按热度、增速、新鲜度打分，分「AI 工具与开源 / 海外热议 / 国内热榜」三栏。
