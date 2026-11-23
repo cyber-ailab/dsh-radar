@@ -8,6 +8,8 @@
 
 ![每日雷达面板](docs/screenshot-radar.png)
 
+> 📺 [配套教程视频（B站，3 分钟看懂安装和用法）](https://www.bilibili.com/video/BV1wjyDz6EV6)
+>
 > 觉得有用，点右上角 ⭐ Star 就是最大的支持；想要哪个平台的榜单、哪种选题栏目，去 [Issues](https://github.com/cyber-ailab/dsh-radar/issues) 或 [Discussions](https://github.com/cyber-ailab/dsh-radar/discussions) 告诉我们。
 
 - **免登录即用**：从抖音热榜、微博热搜、今日头条热榜、百度热搜、B站排行、Hacker News、Hugging Face 趋势、GitHub 新星、YouTube 频道抓取公开数据，不需要任何账号。
@@ -117,7 +119,7 @@ npm run pack   # 产出 dsh-radar-<version>.tgz
 
 - 抖音：**赛博实验室**（抖音号 `cyberlaboratory`）· [主页](https://www.douyin.com/user/MS4wLjABAAAA00XEpPcyhO1sKmolKQEWvU1TeyDcVwTG9lmeLguMQvc)
 - B站：**赛博Laboratory** · [主页](https://space.bilibili.com/485924578)
-- 教程视频（含从零安装、使用、打分拆解）：在抖音和 B站搜「每日雷达」，或看上面主页置顶。
+- 📺 **教程视频**（从零安装、使用、打分拆解）：[B站 · 别再一个个平台刷热点了](https://www.bilibili.com/video/BV1wjyDz6EV6)
 
 ## 许可证
 
