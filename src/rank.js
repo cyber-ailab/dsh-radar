@@ -9,11 +9,11 @@ export const DEFAULT_KEYWORDS = {
 const ZONES = {
   tools: { title: 'AI 工具与开源', desc: '新模型、新仓库：能不能拿来用' },
   global: { title: '海外热议', desc: 'Hacker News / YouTube 上正在讨论的' },
-  cn: { title: '国内热榜', desc: 'B站排行里与 AI/科技相关的作品' },
+  cn: { title: '国内热榜', desc: '抖音 / 微博 / 头条 / 百度热搜 + B站排行里与 AI/科技相关的' },
 }
 
 const num = v => (Number.isFinite(+v) ? +v : 0)
-const heatOf = m => num(m.view) * 0.02 + num(m.like) + num(m.comment) * 2 + num(m.share) * 3 + num(m.coin) + num(m.score) * 5 + num(m.stars) * 4 + num(m.download) * 0.01 + num(m.trending) * 3
+const heatOf = m => num(m.hot) * 0.002 + num(m.view) * 0.02 + num(m.like) + num(m.comment) * 2 + num(m.share) * 3 + num(m.coin) + num(m.score) * 5 + num(m.stars) * 4 + num(m.download) * 0.01 + num(m.trending) * 3
 const ageH = p => (p ? Math.max(0.5, (Date.now() - Date.parse(p)) / 36e5) : null)
 
 function pct(arr) {
@@ -35,12 +35,13 @@ export function relevance(it, kw) {
   }
   const t = `${it.title} ${(it.tags || []).join(' ')} ${it.summary || ''}`
   if (kw.strongRx.test(t)) return 1
+  if (it.kind === 'topic') return 0          // 热搜词必须强相关（「融资」「上市」这类次要词在热搜里大多是财经新闻）
   if (kw.midRx.test(t)) return 0.6
   return it.zone === 'tools' ? 0.5 : 0   // 工具源本身就是 AI 相关，兜底 0.5
 }
 
 /** prev: 上次快照 {key: heat}，用于增速（两次快照差分）；首见用生命周期均速 */
-export function rank(items, { keywords = DEFAULT_KEYWORDS, prev = {}, topN = 8, maxAgeDays = 7 } = {}) {
+export function rank(items, { keywords = DEFAULT_KEYWORDS, prev = {}, topN = 10, maxAgeDays = 7 } = {}) {
   const kw = { strongRx: new RegExp(keywords.strong, 'i'), midRx: new RegExp(keywords.mid, 'i') }
   const rows = []
   for (const it of items) {
@@ -63,12 +64,12 @@ export function rank(items, { keywords = DEFAULT_KEYWORDS, prev = {}, topN = 8, 
       const fresh = r.age_h === null ? 0.6 : Math.max(0.05, 1 - r.age_h / (maxAgeDays * 24))
       const parts = r.er === null ? (0.45 * ph(r.heat) + 0.35 * pv(r.vel)) / 0.8 : 0.45 * ph(r.heat) + 0.35 * pv(r.vel) + 0.2 * pe(r.er)
       r.score = Math.round(100 * r.R * Math.sqrt(fresh) * parts * 10) / 10
-      r.badge = r.age_h !== null && r.age_h <= 36 && pv(r.vel) >= 0.8 ? '📈增速' : ph(r.heat) >= 0.9 ? '🔥爆款' : r.age_h !== null && r.age_h <= 48 ? '🆕新' : ''
+      r.badge = r.cached ? '🕘缓存' : r.age_h !== null && r.age_h <= 36 && pv(r.vel) >= 0.8 ? '📈增速' : ph(r.heat) >= 0.9 ? '🔥爆款' : r.age_h !== null && r.age_h <= 48 ? '🆕新' : ''
     }
     const perAuthor = {}, perPlat = {}
     out[z] = {
       key: z, ...ZONES[z],
-      items: zr.sort((a, b) => b.score - a.score).filter(r => (perAuthor[r.author] = (perAuthor[r.author] || 0) + 1) <= 2 && (perPlat[r.platform] = (perPlat[r.platform] || 0) + 1) <= Math.ceil(topN * 0.6)).slice(0, topN),
+      items: zr.sort((a, b) => b.score - a.score).filter(r => (!r.author || (perAuthor[r.author] = (perAuthor[r.author] || 0) + 1) <= 2) && (perPlat[r.platform] = (perPlat[r.platform] || 0) + 1) <= Math.ceil(topN * 0.4)).slice(0, topN),
     }
   }
   return out

@@ -2,7 +2,8 @@
 
 把「每天看一眼 AI 圈在热什么」和「把热点变成能开工的选题」装进 DeepSeek Harness（DSH）。
 
-- **免登录即用**：从 Hacker News、Hugging Face 趋势、GitHub 新星、B站排行、YouTube 频道抓取公开数据，不需要任何账号。
+- **免登录即用**：从抖音热榜、微博热搜、今日头条热榜、百度热搜、B站排行、Hacker News、Hugging Face 趋势、GitHub 新星、YouTube 频道抓取公开数据，不需要任何账号。
+- **不抓的平台**：小红书、知乎、快手的榜单接口必须登录或签名，插件不做模拟登录，所以不抓。
 - **按热度·增速·新鲜度打分**，分三栏出榜：AI 工具与开源 / 海外热议 / 国内热榜。
 - **生成创意话题**：勾选条目，按「选题组装公式」规则粗筛成选题卡；一键交给 DSH 里的模型完善成可开工的选题（标题、开头台词、分段大纲、待核实事实）。
 - **可选登录模式**：填你自己的 GitHub Token / B站 SESSDATA 提高抓取额度；只存本机、只读使用。
@@ -64,7 +65,7 @@ node src/engine.js topics    # 用各栏前 2 条出选题卡
 
 ```json
 {
-  "sources": ["hackernews", "huggingface", "github", "bilibili", "youtube"],
+  "sources": ["douyin", "weibo", "toutiao", "baidu", "bilibili", "hackernews", "huggingface", "github", "youtube"],
   "youtubeChannels": [{ "id": "UCbfYPyITQ-7l4upoX8nvctg", "name": "Two Minute Papers" }],
   "topN": 8,
   "maxAgeDays": 7,
@@ -82,7 +83,8 @@ node src/engine.js topics    # 用各栏前 2 条出选题卡
 ## 数据与隐私
 
 - 只请求各平台的公开接口；登录模式只把你自己填的凭据附在请求头里，只读，不做模拟登录、不绕过任何限制。
-- 数据存在 `~/.dsh-radar/`（每日 JSON + Markdown），配置文件权限 600。
+- 数据存在 `~/.dsh-radar/`（每日 JSON + Markdown），配置文件权限 600；界面里路径显示为 `~`，不暴露用户名。
+- 某个平台这次没抓到时，用 6 小时内的缓存补上，并在条目上标「🕘缓存」。
 - 只保存标题、链接和数字，不下载视频或图片。
 
 ## 开发

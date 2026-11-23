@@ -75,3 +75,11 @@ test('rank：刷星仓库（星多 fork 少）和 uncensored 变体被过滤', (
   ])
   assert.deepEqual(z.tools.items.map(i => i.key), ['gh:y/real'])
 })
+
+test('rank：热搜词只认强相关', () => {
+  const z = rank([
+    { key: 'dy:1', title: 'AI是否已证明黎曼猜想', platform: '抖音', zone: 'cn', kind: 'topic', metrics: { hot: 8e6 } },
+    { key: 'dy:2', title: '沪深北交易所调整融资保证金比例', platform: '抖音', zone: 'cn', kind: 'topic', metrics: { hot: 1e7 } },
+  ])
+  assert.deepEqual(z.cn.items.map(i => i.key), ['dy:1'])
+})

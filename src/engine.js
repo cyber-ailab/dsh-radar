@@ -8,14 +8,14 @@ import { fuse, PROGRAMS } from './topics.js'
 
 export const DEFAULT_CONFIG = {
   dataDir: path.join(os.homedir(), '.dsh-radar'),
-  sources: ['hackernews', 'huggingface', 'github', 'bilibili', 'youtube'],
+  sources: ['hackernews', 'huggingface', 'github', 'bilibili', 'youtube', 'douyin', 'weibo', 'toutiao', 'baidu'],
   youtubeChannels: [
     { id: 'UCSHZKyawb77ixDdsGog4iWA', name: 'Lex Fridman' }, { id: 'UCXl4i9dYBrFOabk0xGmbkRA', name: 'Dwarkesh Patel' },
     { id: 'UCbfYPyITQ-7l4upoX8nvctg', name: 'Two Minute Papers' }, { id: 'UCsBjURrPoezykLs9EqgamOA', name: 'Fireship' },
     { id: 'UCNJ1Ymd5yFuUPtn21xtRbbw', name: 'AI Explained' }, { id: 'UCcefcZRL2oaA_uBNeo5UOWg', name: 'Y Combinator' },
   ],
   keywords: DEFAULT_KEYWORDS,
-  topN: 8,
+  topN: 10,
   maxAgeDays: 7,
   programs: null,         // 自定义栏目：{ id: {name, need:'P|K|E|T', dur, angle, struct, hook, tpl:[...]} }；null = 用默认通用栏目
   login: {},              // 登录模式（可选，全部只读）：{ githubToken, biliSessdata } 或环境变量 GITHUB_TOKEN / BILI_SESSDATA
@@ -53,14 +53,23 @@ export async function runRadar(c, { only = null, onLog = () => {} } = {}) {
   const prev = await readJ(prevP, {})
   const stats = {}, items = []
   const ids = (only || c.sources).filter(id => SOURCES[id])
+  const cacheP = path.join(c.dataDir, 'cache.json'), cache = await readJ(cacheP, {})
   await Promise.all(ids.map(async id => {
     const t0 = Date.now()
     try {
       const r = await SOURCES[id].fetch({ config: c, creds: c.creds })
-      items.push(...r); stats[id] = { ok: true, n: r.length, ms: Date.now() - t0, login: SOURCES[id].login && Object.values(c.creds).some(Boolean) ? 'used' : 'none' }
+      items.push(...r); cache[id] = { at: Date.now(), items: r.slice(0, 200) }
+      stats[id] = { ok: true, n: r.length, ms: Date.now() - t0, login: SOURCES[id].login && Object.values(c.creds).some(Boolean) ? 'used' : 'none' }
       onLog(`✓ ${SOURCES[id].name} ${r.length} 条`)
-    } catch (e) { stats[id] = { ok: false, error: String(e.message || e).slice(0, 160), ms: Date.now() - t0 }; onLog(`✗ ${SOURCES[id].name}：${stats[id].error}`) }
+    } catch (e) {
+      const cu = cache[id]
+      const fresh = cu && Date.now() - cu.at < 6 * 36e5          // 6 小时内的缓存放进榜，并标出来源是缓存
+      if (fresh) items.push(...cu.items.map(x => ({ ...x, cached: true })))
+      stats[id] = { ok: false, cached: !!fresh, error: String(e.message || e).slice(0, 160), ms: Date.now() - t0 }
+      onLog(`✗ ${SOURCES[id].name}：${stats[id].error}${fresh ? `（用 ${new Date(cu.at).toTimeString().slice(0, 5)} 的缓存）` : ''}`)
+    }
   }))
+  await writeFile(cacheP, JSON.stringify(cache))
   const zones = rank(items, { keywords: c.keywords, prev, topN: c.topN, maxAgeDays: c.maxAgeDays })
   const snap = { ...prev }
   for (const z of Object.values(zones)) for (const it of z.items) snap[it.key] = { heat: it.heat, at: Date.now() }
@@ -74,9 +83,10 @@ export async function runRadar(c, { only = null, onLog = () => {} } = {}) {
   return doc
 }
 
+export { NOT_SUPPORTED } from './sources.js'
 const fmtN = n => (n >= 1e4 ? (n / 1e4).toFixed(1) + '万' : String(Math.round(n)))
 export function metricsText(m = {}) {
-  const L = [['view', '播放'], ['like', '赞'], ['comment', '评'], ['score', '分'], ['stars', '★'], ['download', '下载']]
+  const L = [['hot', '热度'], ['view', '播放'], ['like', '赞'], ['comment', '评'], ['score', '分'], ['stars', '★'], ['download', '下载']]
   return L.filter(([k]) => m[k]).map(([k, l]) => `${l} ${fmtN(m[k])}`).join(' · ')
 }
 
@@ -89,7 +99,9 @@ export function toMarkdown(doc) {
     L.push('')
   }
   const bad = Object.entries(doc.sources).filter(([, s]) => !s.ok)
-  if (bad.length) L.push('## 未取到', '', ...bad.map(([id, s]) => `- ${id}：${s.error}`), '')
+  if (bad.length) L.push('## 未取到', '', ...bad.map(([id, s]) => `- ${id}：${s.error}${s.cached ? '（已用最近一次缓存补上）' : ''}`), '')
+  const cached = doc.zones.flatMap(z => z.items).filter(it => it.cached)
+  if (cached.length) L.push(`> 其中 ${cached.length} 条来自缓存（该平台这次没抓到），出片前再刷一次`, '')
   return L.join('\n')
 }
 

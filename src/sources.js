@@ -68,7 +68,9 @@ const github = {
   async fetch({ creds }) {
     const q = encodeURIComponent(`created:>${daysAgo(4)} (ai OR llm OR agent OR video OR diffusion) in:name,description,topics`)
     const headers = creds.githubToken ? { Authorization: `Bearer ${creds.githubToken}` } : {}
-    const d = await getJSON(`https://api.github.com/search/repositories?q=${q}&sort=stars&order=desc&per_page=40`, { headers })
+    let d
+    try { d = await getJSON(`https://api.github.com/search/repositories?q=${q}&sort=stars&order=desc&per_page=40`, { headers }) }
+    catch (e) { if (/HTTP 40[39]/.test(e.message)) throw new Error('GitHub 搜索免登录每分钟只能 10 次，刚才刷得太频繁；等一分钟再刷，或在「登录设置」填 GitHub Token'); throw e }
     return d.items.map(r => ({
       key: 'gh:' + r.full_name, title: `${r.full_name}：${r.description || ''}`.slice(0, 160), link: r.html_url, author: r.owner?.login,
       platform: 'GitHub', zone: 'tools', metrics: { stars: r.stargazers_count, fork: r.forks_count }, published: iso(r.created_at),
@@ -125,4 +127,58 @@ const youtube = {
 }
 const decode = s => s.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>')
 
-export const SOURCES = { hackernews, huggingface, github, bilibili, youtube }
+/** 抖音热榜（网页版公开接口，免登录；只有热词与热度，没有作品播放量） */
+const douyin = {
+  id: 'douyin', name: '抖音热榜', zone: 'cn',
+  async fetch() {
+    const d = await getJSON('https://www.douyin.com/aweme/v1/web/hot/search/list/?device_platform=webapp&aid=6383&channel=channel_pc_web&detail_list=1',
+      { headers: { Referer: 'https://www.douyin.com/' } })
+    const wl = d?.data?.word_list || []
+    if (!wl.length) throw new Error('抖音热榜返回为空（可能被风控），稍后再刷新')
+    return wl.map(w => ({
+      key: 'dy:' + (w.sentence_id || w.word), title: w.word, link: `https://www.douyin.com/hot/${w.sentence_id}`, platform: '抖音', zone: 'cn',
+      kind: 'topic', metrics: { hot: w.hot_value, video: w.video_count }, published: w.event_time ? iso(w.event_time * 1000) : undefined,
+    }))
+  },
+}
+
+/** 微博热搜（公开接口，免登录） */
+const weibo = {
+  id: 'weibo', name: '微博热搜', zone: 'cn',
+  async fetch() {
+    const d = await getJSON('https://weibo.com/ajax/side/hotSearch', { headers: { Referer: 'https://weibo.com/' } })
+    return (d?.data?.realtime || []).filter(x => x.word && !x.is_ad).map(x => ({
+      key: 'wb:' + x.word, title: x.word, link: `https://s.weibo.com/weibo?q=${encodeURIComponent('#' + x.word + '#')}`, platform: '微博', zone: 'cn',
+      kind: 'topic', metrics: { hot: x.num },
+    }))
+  },
+}
+
+/** 今日头条热榜（公开接口，免登录） */
+const toutiao = {
+  id: 'toutiao', name: '头条热榜', zone: 'cn',
+  async fetch() {
+    const d = await getJSON('https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc', { headers: { Referer: 'https://www.toutiao.com/' } })
+    return (d?.data || []).map(x => ({
+      key: 'tt:' + x.ClusterId, title: x.Title, link: x.Url, platform: '头条', zone: 'cn', kind: 'topic', metrics: { hot: +x.HotValue || 0 },
+    }))
+  },
+}
+
+/** 百度热搜（公开接口，免登录） */
+const baidu = {
+  id: 'baidu', name: '百度热搜', zone: 'cn',
+  async fetch() {
+    const d = await getJSON('https://top.baidu.com/api/board?platform=wise&tab=realtime', { headers: { Referer: 'https://top.baidu.com/' } })
+    const list = d?.data?.cards?.[0]?.content?.[0]?.content || d?.data?.cards?.[0]?.content || []
+    return list.filter(x => x.word).map((x, i) => ({
+      key: 'bd:' + x.word, title: x.word, link: x.url || `https://www.baidu.com/s?wd=${encodeURIComponent(x.word)}`, platform: '百度', zone: 'cn',
+      kind: 'topic', metrics: { hot: +x.hotScore || Math.max(1, 60 - i) * 1e4 }, summary: x.desc,
+    }))
+  },
+}
+
+export const SOURCES = { hackernews, huggingface, github, bilibili, youtube, douyin, weibo, toutiao, baidu }
+
+/** 需要登录、本插件不抓的平台（如实告诉用户） */
+export const NOT_SUPPORTED = { xiaohongshu: '小红书：接口要求登录签名，插件不做模拟登录', zhihu: '知乎热榜：需要登录（401）', kuaishou: '快手：需要登录态与签名' }

@@ -8,7 +8,7 @@ window.__ModuleLoader__.load({ id: 'dsh-radar', factory: (require) => {
   const api = async (p, opt) => { const r = await fetch('/dsh-radar' + p, opt); const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j }
   const post = (p, body) => api(p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
   const fmt = n => (!n ? '' : n >= 1e4 ? (n / 1e4).toFixed(1) + '万' : String(Math.round(n)))
-  const metrics = m => [['view', '播放'], ['like', '赞'], ['comment', '评'], ['score', '分'], ['stars', '★'], ['download', '下载']].filter(([k]) => m && m[k]).map(([k, l]) => `${l} ${fmt(m[k])}`).join(' · ')
+  const metrics = m => [['hot', '热度'], ['view', '播放'], ['like', '赞'], ['comment', '评'], ['score', '分'], ['stars', '★'], ['download', '下载']].filter(([k]) => m && m[k]).map(([k, l]) => `${l} ${fmt(m[k])}`).join(' · ')
 
   function Icon() {
     return h('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' },
@@ -69,7 +69,7 @@ window.__ModuleLoader__.load({ id: 'dsh-radar', factory: (require) => {
       showLogin ? h(Login, { cfg, onSaved: c => { setCfg(x => ({ ...x, ...c })); setShowLogin(false) } }) : null,
       data?.running ? h('pre', { className: 'rdr-log' }, (data.log || []).join('\n') || '开始抓取…') : null,
       err ? h('div', { className: 'rdr-err' }, err) : null,
-      !doc && !data?.running ? h('div', { className: 'rdr-empty' }, h('p', null, '还没有日报。点「刷新雷达」，从 Hacker News、Hugging Face、GitHub、B站、YouTube 抓今天的 AI 热点（免登录，约 10 秒）。')) : null,
+      !doc && !data?.running ? h('div', { className: 'rdr-empty' }, h('p', null, '还没有日报。点「刷新雷达」，从抖音、微博、头条、百度、B站、Hacker News、Hugging Face、GitHub、YouTube 抓今天的 AI 热点（免登录，约 10 秒）。')) : null,
       doc ? h('div', { className: 'rdr-body' },
         h('div', { className: 'rdr-zones' }, doc.zones.map(z => h('section', { key: z.key, className: 'rdr-zone' },
           h('h3', null, z.title, h('small', null, z.desc)),

@@ -4,6 +4,7 @@
 //   路由：/dsh-radar/*（给前端面板读数据、触发刷新、出选题）
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
+import os from 'node:os'
 import { resolveConfig, runRadar, loadDay, listDates, makeTopics, toMarkdown, topicsMarkdown, metricsText, DEFAULT_CONFIG } from './engine.js'
 import { PROGRAMS } from './topics.js'
 
@@ -11,6 +12,8 @@ export const name = 'dsh-radar'
 export const inject = ['tools', 'webServer']
 
 const text = s => [{ type: 'text', text: s }]
+// 界面里不暴露用户名：家目录显示成 ~
+const tilde = p => (p.startsWith(os.homedir()) ? '~' + p.slice(os.homedir().length) : p)
 
 export async function apply(ctx, userConfig = {}) {
   const fileCfgPath = path.join(userConfig.dataDir || DEFAULT_CONFIG.dataDir, 'config.json')
@@ -108,7 +111,7 @@ export async function apply(ctx, userConfig = {}) {
         }
         if (p === '/config' && req.method === 'GET')
           return json(res, 200, { mode: cfg.mode, sources: cfg.sources, programs: Object.entries(cfg.programDefs).map(([id, v]) => ({ id, name: v.name, need: v.need, dur: v.dur })),
-            login: { github: !!cfg.creds.githubToken, bilibili: !!cfg.creds.biliSessdata }, dataDir: cfg.dataDir, configFile: fileCfgPath })
+            login: { github: !!cfg.creds.githubToken, bilibili: !!cfg.creds.biliSessdata }, dataDir: tilde(cfg.dataDir), configFile: tilde(fileCfgPath) })
         if (p === '/login' && req.method === 'POST') {   // 登录模式：只保存用户自己粘贴的凭据到本机配置文件
           const b = await readBody(req)
           const login = { ...(fileCfg.login || {}) }
