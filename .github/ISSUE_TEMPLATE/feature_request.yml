@@ -1,0 +1,14 @@
+name: 想要的功能
+description: 新数据源、新选题栏目、新玩法
+labels: [enhancement]
+body:
+  - type: textarea
+    id: want
+    attributes:
+      label: 想要什么
+      description: 说清楚场景：你想用它解决什么选题问题。
+    validations: { required: true }
+  - type: textarea
+    id: api
+    attributes:
+      label: 如果是新数据源：有没有公开、免登录的接口链接

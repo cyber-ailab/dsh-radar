@@ -1,0 +1,26 @@
+name: 报告问题
+description: 抓不到数据、报错、榜单不对
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 期望是什么，实际是什么。截图更好。
+    validations: { required: true }
+  - type: dropdown
+    id: source
+    attributes:
+      label: 哪个数据源
+      multiple: true
+      options: [抖音, 微博, 今日头条, 百度, B站, Hacker News, Hugging Face, GitHub, YouTube, 其他/不确定]
+  - type: input
+    id: ver
+    attributes:
+      label: 版本信息
+      placeholder: "dsh-radar 0.1.0 / DSH 0.2.x / Node 22"
+  - type: textarea
+    id: log
+    attributes:
+      label: 日志（请先去掉 token、cookie、本机路径）
+      render: shell

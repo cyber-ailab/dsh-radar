@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 聊聊想法、晒你的用法
+    url: https://github.com/cyber-ailab/dsh-radar/discussions
+    about: 没想好是不是 bug，或者想分享怎么用，来 Discussions

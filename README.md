@@ -1,6 +1,14 @@
 # dsh-radar · 每日雷达 + 创意选题（DeepSeek Harness 插件）
 
-把「每天看一眼 AI 圈在热什么」和「把热点变成能开工的选题」装进 DeepSeek Harness（DSH）。
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/cyber-ailab/dsh-radar)](https://github.com/cyber-ailab/dsh-radar/releases)
+[![Stars](https://img.shields.io/github/stars/cyber-ailab/dsh-radar?style=social)](https://github.com/cyber-ailab/dsh-radar)
+
+把「每天看一眼 AI 圈在热什么」和「把热点变成能开工的选题」装进 DeepSeek Harness（DSH）。免登录、零依赖、免费开源。
+
+![每日雷达面板](docs/screenshot-radar.png)
+
+> 觉得有用，点右上角 ⭐ Star 就是最大的支持；想要哪个平台的榜单、哪种选题栏目，去 [Issues](https://github.com/cyber-ailab/dsh-radar/issues) 或 [Discussions](https://github.com/cyber-ailab/dsh-radar/discussions) 告诉我们。
 
 - **免登录即用**：从抖音热榜、微博热搜、今日头条热榜、百度热搜、B站排行、Hacker News、Hugging Face 趋势、GitHub 新星、YouTube 频道抓取公开数据，不需要任何账号。
 - **不抓的平台**：小红书、知乎、快手的榜单接口必须登录或签名，插件不做模拟登录，所以不抓。
@@ -14,7 +22,7 @@
 
 ```sh
 # 1) 下载插件包（或自己构建：npm run pack）
-curl -LO https://github.com/<you>/dsh-radar/releases/download/v0.1.0/dsh-radar-0.1.0.tgz
+curl -LO https://github.com/cyber-ailab/dsh-radar/releases/download/v0.1.0/dsh-radar-0.1.0.tgz
 
 # 2) 装进你的 DSH profile（web 为例）
 dsh plugin --profile web add ./dsh-radar-0.1.0.tgz
@@ -95,6 +103,21 @@ npm run pack   # 产出 dsh-radar-<version>.tgz
 ```
 
 源码零依赖：`src/sources.js` 数据源 · `src/rank.js` 打分 · `src/topics.js` 选题公式 · `src/engine.js` 引擎与 CLI · `src/index.js` DSH 宿主插件 · `src/client.js` 面板。
+
+## 参与
+
+- 🐞 抓不到、报错、榜单口径不对：[提 Issue](https://github.com/cyber-ailab/dsh-radar/issues/new/choose)
+- 💡 想加的数据源、选题栏目、玩法：[Discussions · Ideas](https://github.com/cyber-ailab/dsh-radar/discussions)
+- 🔧 想自己动手：看 [CONTRIBUTING.md](CONTRIBUTING.md)，带 `good first issue` 标签的都是新手友好；后续计划见 [Roadmap](https://github.com/cyber-ailab/dsh-radar/issues?q=label%3Aroadmap)
+- 📜 版本记录：[CHANGELOG.md](CHANGELOG.md)
+
+## 关于赛博实验室
+
+我们是 **赛博实验室 Cyber Lab**，用 AI 拍剧、做工具，把做出来的东西开源。这个插件就是我们每天在用的选题工具。
+
+- 抖音：**赛博实验室**（抖音号 `cyberlaboratory`）· [主页](https://www.douyin.com/user/MS4wLjABAAAA00XEpPcyhO1sKmolKQEWvU1TeyDcVwTG9lmeLguMQvc)
+- B站：**赛博Laboratory** · [主页](https://space.bilibili.com/485924578)
+- 教程视频（含从零安装、使用、打分拆解）：在抖音和 B站搜「每日雷达」，或看上面主页置顶。
 
 ## 许可证
 

@@ -47,5 +47,14 @@
     "radar",
     "ai-news",
     "topics"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyber-ailab/dsh-radar.git"
+  },
+  "homepage": "https://github.com/cyber-ailab/dsh-radar#readme",
+  "bugs": {
+    "url": "https://github.com/cyber-ailab/dsh-radar/issues"
+  },
+  "author": "Cyber Lab <https://github.com/cyber-ailab>"
 }
